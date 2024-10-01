@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
+from tkinter.scrolledtext import ScrolledText
 from collections import Counter
 import pandas as pd
 import os
@@ -9,19 +10,26 @@ class DocumentReader:
         self.root = root
         self.root.title("Document Reader")
         
+        # GUI "Read File" button
         self.open_button = tk.Button(root, text="Read File", command=self.open_file)
         self.open_button.pack(pady=5)
         
+        # GUI text input field
         self.text_area = tk.Text(root, wrap='word', height=20, width=50)
         self.text_area.pack(pady=10)
         
+        # GUI "Count Words" button
         self.count_button = tk.Button(root, text="Count Words", command=self.count_words)
         self.count_button.pack(pady=5)
 
+        # GUI "Export to Excel" button
         self.export_button = tk.Button(root, text="Export to Excel", command=self.export_to_excel)
         self.export_button.pack(pady=5)
 
         self.word_count = None
+
+        # Set GUI window size
+        self.geometry("500x700") 
 
     def open_file(self):
         file_path = filedialog.askopenfilename()
