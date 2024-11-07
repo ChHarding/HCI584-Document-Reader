@@ -9,9 +9,9 @@ from docx import Document  # For reading .docx files
 import PyPDF2            # For reading .pdf files
 
 
-class DocumentReader(tk.Tk):  # CH
-    def __init__(self): # CH
-        super().__init__()  #CH
+class DocumentReader(tk.Tk):
+    def __init__(self):
+        super().__init__()
 
         self.title("Document Reader")
         
@@ -20,9 +20,21 @@ class DocumentReader(tk.Tk):  # CH
         self.open_button.pack(pady=5)
         
         # GUI text input field
-        self.text_area = ScrolledText(self, wrap='word', height=17, width=50)
+        self.text_area = ScrolledText(self, wrap='word', height=10, width=50)
         self.text_area.pack(pady=5)
         
+        # GUI "Include Terms" label and input field
+        self.include_terms_label = tk.Label(self, text="Enter Terms to Include (comma separated):")
+        self.include_terms_label.pack(pady=5)
+        self.include_terms_entry = tk.Entry(self, width=50)
+        self.include_terms_entry.pack(pady=5)
+
+        # GUI "Exclude Terms" label and input field
+        self.exclude_terms_label = tk.Label(self, text="Enter Terms to Exclude (comma separated):")
+        self.exclude_terms_label.pack(pady=5)
+        self.exclude_terms_entry = tk.Entry(self, width=50)
+        self.exclude_terms_entry.pack(pady=5)
+
         # GUI "Count Words" button
         self.count_button = tk.Button(self, text="Count Words", command=self.count_words)
         self.count_button.pack(pady=5)
@@ -32,13 +44,15 @@ class DocumentReader(tk.Tk):  # CH
         self.export_button.pack(pady=5)
 
         # GUI text output field
-        self.text_area_out = ScrolledText(self, wrap='word', height=17, width=50)
+        self.text_area_out = ScrolledText(self, wrap='word', height=10, width=50)
         self.text_area_out.pack(pady=5)
 
         self.word_count = None
+        self.include_terms = set()  # Store the terms to include
+        self.exclude_terms = set()  # Store the terms to exclude
 
         # Set GUI window size
-        self.geometry("500x700") 
+        self.geometry("500x600") 
 
     def open_file(self):
         file_path = filedialog.askopenfilename(filetypes=[
@@ -75,20 +89,38 @@ class DocumentReader(tk.Tk):  # CH
             messagebox.showerror("Error", f"Failed to read file: {e}")    
 
     def count_words(self):
-        content = self.text_area.get("1.0", tk.END).strip().lower() #convert to lowercase
+        content = self.text_area.get("1.0", tk.END).strip().lower()  # Convert to lowercase
 
         # Remove symbols, punctuation, and numbers
         content = re.sub(r'[^a-z\s]', '', content)
-        
+
+        # Get the user input from the Include Terms field and split into a set of terms
+        include_terms_input = self.include_terms_entry.get().strip().lower()
+        self.include_terms = set(include_terms_input.split(',')) if include_terms_input else set()
+
+        # Get the user input from the Exclude Terms field and split into a set of terms
+        exclude_terms_input = self.exclude_terms_entry.get().strip().lower()
+        self.exclude_terms = set(exclude_terms_input.split(',')) if exclude_terms_input else set()
+
         words = content.split()
-        self.word_count = Counter(words)
+
+        # If no include terms are specified, include all words
+        if not self.include_terms:
+            filtered_words = [word for word in words if word not in self.exclude_terms]  # Exclude only specified terms
+        else:
+            # Filter out terms based on Include and Exclude lists
+            filtered_words = [
+                word for word in words if word in self.include_terms and word not in self.exclude_terms
+            ]
+
+        self.word_count = Counter(filtered_words)
 
         self.display_word_count()
 
     def display_word_count(self):
         if self.word_count:
             self.text_area_out.delete(1.0, tk.END)  # Clear current text in the output area
-            self.text_area_out.insert(tk.END, "Word Counts:\n\n")  # Add header
+            self.text_area_out.insert(tk.END, "Word Counts (Filtered by Include and Exclude Terms):\n\n")  # Add header
 
             # Sort word counts alphabetically
             sorted_word_count = sorted(self.word_count.items())
