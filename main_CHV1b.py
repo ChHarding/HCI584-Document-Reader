@@ -14,45 +14,63 @@ class DocumentReader(tk.Tk):
         super().__init__()
 
         self.title("Document Reader")
+        self.geometry("500x700")  # Set a larger window size for better spacing
+        self.config(bg="#B2EBF2")  # Light background
+
+        # Font and color settings
+        self.font_style = ("Helvetica", 12)
+        self.button_font = ("Helvetica", 10, "bold")
+        self.bg_color = "#E0F2F1"  # Light background color
+        self.button_color = "#004D40"  # Dark Green button color
+        self.button_fg = "#E0F2F1" # Aqua button font
+        self.entry_width = 50  # Set a consistent width for entries
         
+        # Create GUI components
+        self.create_widgets()
+
+    def create_widgets(self):
         # GUI "Read File" button
-        self.open_button = tk.Button(self, text="Read File", command=self.open_file)
-        self.open_button.pack(pady=5)
-        
+        self.open_button = tk.Button(self, text="Read File", command=self.open_file,
+                                     font=self.button_font, bg=self.button_color, fg=self.button_fg,
+                                     relief="flat", width=20, height=2)
+        self.open_button.grid(row=0, column=0, pady=10, padx=20, sticky="ew")
+
         # GUI text input field
-        self.text_area = ScrolledText(self, wrap='word', height=10, width=50)
-        self.text_area.pack(pady=5)
-        
+        self.text_area = ScrolledText(self, wrap='word', height=8, width=50, font=self.font_style, bg="#E0F2F1", fg="#000000")
+        self.text_area.grid(row=1, column=0, pady=10, padx=20)
+
         # GUI "Include Terms" label and input field
-        self.include_terms_label = tk.Label(self, text="Enter Terms to Include (comma separated):")
-        self.include_terms_label.pack(pady=5)
-        self.include_terms_entry = tk.Entry(self, width=50)
-        self.include_terms_entry.pack(pady=5)
+        self.include_terms_label = tk.Label(self, text="Enter Terms to Include in Your Search (comma separated):", font=self.font_style, bg=self.bg_color)
+        self.include_terms_label.grid(row=2, column=0, pady=5, padx=20, sticky="w")
+        self.include_terms_entry = tk.Entry(self, width=self.entry_width, font=self.font_style)
+        self.include_terms_entry.grid(row=3, column=0, pady=5, padx=20, sticky="w")
 
         # GUI "Exclude Terms" label and input field
-        self.exclude_terms_label = tk.Label(self, text="Enter Terms to Exclude (comma separated):")
-        self.exclude_terms_label.pack(pady=5)
-        self.exclude_terms_entry = tk.Entry(self, width=50)
-        self.exclude_terms_entry.pack(pady=5)
+        self.exclude_terms_label = tk.Label(self, text="Enter Terms to Exclude from Your Search (comma separated):", font=self.font_style, bg=self.bg_color)
+        self.exclude_terms_label.grid(row=4, column=0, pady=5, padx=20, sticky="w")
+        self.exclude_terms_entry = tk.Entry(self, width=self.entry_width, font=self.font_style)
+        self.exclude_terms_entry.grid(row=5, column=0, pady=5, padx=20, sticky="w")
 
         # GUI "Count Words" button
-        self.count_button = tk.Button(self, text="Count Words", command=self.count_words)
-        self.count_button.pack(pady=5)
+        self.count_button = tk.Button(self, text="Count Words", command=self.count_words,
+                                      font=self.button_font, bg=self.button_color, fg=self.button_fg,
+                                      relief="flat", width=20, height=2)
+        self.count_button.grid(row=6, column=0, pady=10, padx=20, sticky="ew")
 
         # GUI "Export to Excel" button
-        self.export_button = tk.Button(self, text="Export to Excel", command=self.export_to_excel)
-        self.export_button.pack(pady=5)
+        self.export_button = tk.Button(self, text="Export to Excel", command=self.export_to_excel,
+                                       font=self.button_font, bg=self.button_color, fg=self.button_fg,
+                                       relief="flat", width=20, height=2)
+        self.export_button.grid(row=7, column=0, pady=10, padx=20, sticky="ew")
 
         # GUI text output field
-        self.text_area_out = ScrolledText(self, wrap='word', height=10, width=50)
-        self.text_area_out.pack(pady=5)
+        self.text_area_out = ScrolledText(self, wrap='word', height=10, width=50, font=self.font_style, bg="#E0F2F1", fg="#000000")
+        self.text_area_out.grid(row=8, column=0, pady=10, padx=20)
 
+        # Store terms to include/exclude
         self.word_count = None
-        self.include_terms = set()  # Store the terms to include
-        self.exclude_terms = set()  # Store the terms to exclude
-
-        # Set GUI window size
-        self.geometry("500x600") 
+        self.include_terms = set()
+        self.exclude_terms = set() 
 
     def open_file(self):
         file_path = filedialog.askopenfilename(filetypes=[
